@@ -1,0 +1,384 @@
+#include <iostream>
+using namespace std;
+
+class Socio
+{
+private:
+    long NumSocio;
+    string NomSocio;
+    string Domicilio;
+    long AñoIngreso;
+
+public:
+    long GetNumSocio() { return NumSocio; }
+    string GetNomSocio() { return NomSocio; }
+    string GetDomicilio() { return Domicilio; }
+    long GetAñoIngreso() { return AñoIngreso; }
+
+    bool operator==(const Socio &otrosocio) const { return NomSocio == otrosocio.NomSocio && Domicilio == otrosocio.Domicilio; }
+    bool operator<(const Socio &otrosocio) const { return NumSocio < otrosocio.NumSocio; }
+    bool operator>(const Socio &otrosocio) const { return NumSocio > otrosocio.NumSocio; }
+    bool operator<=(const Socio &otrosocio) const { return NumSocio <= otrosocio.NumSocio; }
+    bool operator>=(const Socio &otrosocio) const { return NumSocio >= otrosocio.NumSocio; }
+    friend std::ostream &operator<<(std::ostream &os, Socio &x)
+    {
+        std::cout << std::endl;
+        os << "|Numero de Socio: " << x.NumSocio;
+        os << "|Nombre: " << x.NomSocio;
+        os << "|Domicilio: " << x.Domicilio;
+        os << "|Año: " << x.AñoIngreso << "|" << std::endl;
+        return os;
+    }
+    friend std::istream &operator>>(std::istream &is, Socio &x)
+    {
+        std::cout << "\n|Numero Socio: ";
+        is >> x.NumSocio;
+        std::cout << "\n|Nombre: ";
+        is >> x.NomSocio;
+        std::cout << "\n|Domicilio: ";
+        is >> x.Domicilio;
+        std::cout << "\n|Año de Ingreso: ";
+        is >> x.AñoIngreso;
+        return is;
+    }
+};
+
+template <class T>
+class LSLSE;
+
+template <class T>
+class Node
+{
+private:
+    T Datos;
+    Node<T> *Sig;
+
+public:
+    Node() : Sig(nullptr){};
+    friend class LSLSE<T>;
+};
+
+template <class T>
+class LSLSE
+{
+private:
+    Node<T> *Lista;
+
+public:
+    LSLSE() : Lista(nullptr){};
+    bool Vacía() const
+    {
+        if (Lista == nullptr)
+            return true;
+        return false;
+    }
+    Node<T> *Ultimo() const
+    {
+        if (Vacía())
+        {
+            return nullptr;
+        }
+        Node<T> *aux = Lista;
+        while (aux->Sig != nullptr)
+        {
+            aux = aux->Sig;
+        }
+        return aux;
+    }
+    Node<T> *Primero() const
+    {
+        if (Vacía())
+        {
+            return nullptr;
+        }
+        return Lista;
+    }
+    Node<T> *Anterior(Node<T> *Pos) const
+    {
+        if (Vacía() || Pos == nullptr || Pos == Lista)
+        {
+            return nullptr;
+        }
+        Node<T> *aux = Lista;
+        while (aux != nullptr && aux->Sig != Pos)
+        {
+            aux = aux->Sig;
+        }
+        return aux;
+    }
+    void Insertar(Node<T> *Pos, T Elem)
+    {
+        Node<T> *aux = new Node<T>;
+        aux->Datos = Elem;
+        if (Pos == nullptr)
+        {
+            aux->Sig = Lista;
+            Lista = aux;
+        }
+        else
+        {
+            aux->Sig = Pos->Sig;
+            Pos->Sig = aux;
+        }
+    }
+    /*
+    void Insertar(T Elem)
+     {
+         Node<T> *aux = new Node<T>;
+         aux->Datos = Elem;
+         if (Lista == nullptr || Elem < Lista->Datos)
+         {
+             aux->Sig = Lista;
+             Lista = aux;
+         }
+         else
+         {
+             Node<T> *p = Lista;
+             while (p->Sig != nullptr && p->Sig->Datos <= Elem)
+             {
+                 p = p->Sig;
+             }
+             aux->Sig = p->Sig;
+             p->Sig = aux;
+         }
+     }
+    */
+    bool Elimina(Node<T> *Pos)
+    {
+        if (Vacía() || Pos == nullptr)
+        {
+            return false;
+        }
+        if (Pos == Lista)
+        {
+            Lista = Lista->Sig;
+        }
+        else
+        {
+            Anterior(Pos)->Sig = Pos->Sig;
+        }
+        delete Pos;
+        return true;
+    }
+    void Imprimir() const
+    {
+        Node<T> *aux = Lista;
+        while (aux != nullptr)
+        {
+            std::cout << aux->Datos;
+            aux = aux->Sig;
+        }
+    }
+    Node<T> Siguiente(Node<T> *Pos)
+    {
+        if (Vacía() || Pos == nullptr)
+            return nullptr;
+        return Pos->Sig;
+    }
+    long Localiza(T Elem)
+    {
+        Node<T> *aux = Lista;
+        while (aux != nullptr && aux->Elem != Elem)
+        {
+            aux = aux->Sig;
+        }
+        return aux;
+    }
+    void Recupera(Node<T> *Pos, T Elem)
+    {
+        if (Vacía() || Pos == nullptr)
+        {
+            std::cout << "|¡Error! Insuficiencia de datos|";
+        }
+        else
+        {
+            return Pos->Elem;
+        }
+    }
+    void Anula()
+    {
+        while (Lista != nullptr)
+        {
+            Node<T> *aux = Lista;
+            Lista = Lista->Sig;
+        }
+    }
+    long Longitud() const
+    {
+        long contador = 0;
+        Node<T> *aux = Lista;
+        while (aux != nullptr)
+        {
+            contador++;
+            aux = aux->Sig;
+        }
+        return contador;
+    }
+    T &operator[](long posición)
+    {
+        if (posición < 0 || posición >= Longitud())
+        {
+            std::cout << "|¡Error! Posición inválida|";
+            exit(1);
+        }
+        Node<T> *aux = Lista;
+        for (long i = 0; i < posición; i++)
+        {
+            aux = aux->Sig;
+        }
+        return aux->Datos;
+    }
+    Node<Socio> *Buscar(int O, string bus)
+    {
+        string nomSocio, domicilio;
+        if (O == 1)
+        {
+            nomSocio = bus;
+        }
+        if (O == 2)
+        {
+            domicilio = bus;
+        }
+        Node<Socio> *aux = Lista;
+        while (aux != nullptr)
+        {
+            if (aux->Datos.GetNomSocio() == nomSocio || aux->Datos.GetDomicilio() == domicilio)
+            {
+                return aux;
+            }
+            aux = aux->Sig;
+            std::cout << aux->Datos;
+        }
+        return nullptr;
+    }
+    void QuickSort(Node<Socio> *inicio, Node<Socio> *fin)
+    {
+        if (inicio == nullptr || fin == nullptr || inicio == fin)
+        {
+            return;
+        }
+        else
+        {
+
+            // Se selecciona el pivote como el último elemento de la lista
+            Socio pivote = fin->Datos;
+            Node<Socio> *i = inicio;
+
+            // Se realiza la partición de los elementos en dos grupos
+            for (Node<Socio> *j = inicio; j != fin; j = j->Sig)
+            {
+                if (j->Datos.GetNumSocio() < pivote.GetNumSocio())
+                {
+                    std::swap(i->Datos, j->Datos);
+                    i = i->Sig;
+                }
+            }
+
+            // Se coloca el pivote en su posición final
+            std::swap(i->Datos, fin->Datos);
+
+            // Se ordenan los dos subgrupos recursivamente
+            QuickSort(inicio, Anterior(i));
+            QuickSort(i->Sig, fin);
+        }
+    }
+};
+
+int main()
+{
+    LSLSE<Socio> Lista;
+    Socio S;
+
+    long O = 1;
+    long B;
+    string Bus;
+    long opc;
+    do
+    {
+        system("pause");
+        system("cls");
+        std::cout << "|Socios:" << Lista.Longitud() << "              |" << endl;
+        std::cout << "|         Menu         |" << endl
+                  << "|1.Reporte  |4.Eliminar|" << endl
+                  << "|2.Registrar|5.Busqueda|" << endl
+                  << "|3.Ordenar  |6.Salir   |" << endl
+                  << "|:";
+        std::cin >> opc;
+        switch (opc)
+        {
+        case 1: // Mostrar
+            if (Lista.Vacía())
+            {
+                std::cout << "|La lista esta vacia|";
+            }
+            // QuickSort
+            //Lista.QuickSort(Lista.Primero(), Lista.Ultimo());
+            Lista.Imprimir();
+            break;
+        case 2: // Registrar
+            O = 0;
+            while (O != 2)
+            {
+                std::cin >> S;
+                Lista.Insertar(Lista.Ultimo(), S);
+                std::cout << "|Quiere Agregar otro Socio 1.si/2.no : ";
+                std::cin >> O;
+            };
+            break;
+        case 3: // Reporte
+            if (Lista.Vacía())
+            {
+                std::cout << "|La lista esta vacia|";
+            }
+            else
+            {
+                Lista.Imprimir();
+                Lista.QuickSort(Lista.Primero(), Lista.Ultimo());
+                Lista.Imprimir();
+            }
+            break;
+        case 4: // Dar de baja
+            if (Lista.Vacía())
+            {
+                std::cout << "|La lista esta vacia|";
+            }
+            else
+            {
+                std::cout << "|1.Elimina/2.Anula : ";
+                std::cin >> B;
+                if (B == 1)
+                {
+                    std::cout << "|Ingrese nombre o domicilio: ";
+                    std::cin >> Bus;
+                    std::cout << "|1.Nombre/2.domicilio:";
+                    std::cin >> B;
+                    Lista.Elimina(Lista.Buscar(B, Bus));
+                }
+                if (B == 2)
+                {
+                    Lista.Anula();
+                }
+            }
+            break;
+        case 5: // Búsqueda
+            if (Lista.Vacía())
+            {
+                std::cout << "|La lista esta vacia|";
+            }
+            if (Lista.Longitud() == 2)
+            {
+                Lista.QuickSort(Lista.Primero(), Lista.Ultimo());
+            }
+            std::cout << "|Ingrese nombre o domicilio: ";
+            std::cin >> Bus;
+            std::cout << "|1.Nombre/2.domicilio:";
+            std::cin >> B;
+            std::cout << Lista.Buscar(B, Bus);
+
+            break;
+        case 6: // Salir
+            std::cout << "|Salio del sistema|";
+            break;
+        }
+    } while (opc != 6);
+}
